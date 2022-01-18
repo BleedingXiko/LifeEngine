@@ -21,15 +21,20 @@ class GridMap {
         }
     }
 
-    fillGrid(state, ignore_walls=false) {
+    map(func) {
         for (var col of this.grid) {
             for (var cell of col) {
-                if (ignore_walls && cell.state===CellStates.wall) continue;
-                cell.setType(state);
-                cell.owner = null;
-                cell.cell_owner = null;
+                func(cell);
             }
         }
+    }
+
+    fillGrid(state) {
+        this.map((cell) => {
+            cell.setType(state);
+            cell.owner = null;
+            cell.cell_owner = null;
+        })
     }
 
     cellAt(col, row) {

@@ -17,7 +17,7 @@ class Organism {
         this.anatomy = new Anatomy(this)
         this.direction = Directions.down; // direction of movement
         this.rotation = Directions.up; // direction of rotation
-        this.can_rotate = Hyperparams.rotationEnabled;
+        this.can_rotate = Hyperparams.moversCanRotate;
         this.move_count = 0;
         this.move_range = 4;
         this.ignore_brain_for = 0;
@@ -47,10 +47,11 @@ class Organism {
 
     // amount of food required before it can reproduce
     foodNeeded() {
-        return this.anatomy.is_mover ? this.anatomy.cells.length + Hyperparams.extraMoverFoodCost : this.anatomy.cells.length;
+        return this.anatomy.cells.length;
     }
 
     lifespan() {
+        // console.log(Hyperparams.lifespanMultiplier)
         return this.anatomy.cells.length * Hyperparams.lifespanMultiplier;
     }
 
@@ -62,7 +63,7 @@ class Organism {
         //produce mutated child
         //check nearby locations (is there room and a direct path)
         var org = new Organism(0, 0, this.env, this);
-        if(Hyperparams.rotationEnabled){
+        if(Hyperparams.offspringRotate){
             org.rotation = Directions.getRandomDirection();
         }
         var prob = this.mutability;
@@ -117,40 +118,45 @@ class Organism {
                 org.species.addPop();
             }
         }
-        Math.max(this.food_collected -= this.foodNeeded(), 0);
+        this.food_collected -= this.foodNeeded();
 
     }
 
     mutate() {
-        let mutated = false;
-        if (this.calcRandomChance(Hyperparams.addProb)) {
-            let branch = this.anatomy.getRandomCell();
-            let state = CellStates.getRandomLivingType();//branch.state;
-            let growth_direction = Neighbors.all[Math.floor(Math.random() * Neighbors.all.length)]
-            let c = branch.loc_col+growth_direction[0];
-            let r = branch.loc_row+growth_direction[1];
+        var choice = Math.floor(Math.random() * 100);
+        var mutated = false;
+        if (choice <= Hyperparams.addProb) {
+            // add cell
+            // console.log("add cell")
+
+            var branch = this.anatomy.getRandomCell();
+            var state = CellStates.getRandomLivingType();//branch.state;
+            var growth_direction = Neighbors.all[Math.floor(Math.random() * Neighbors.all.length)]
+            var c = branch.loc_col+growth_direction[0];
+            var r = branch.loc_row+growth_direction[1];
             if (this.anatomy.canAddCellAt(c, r)){
                 mutated = true;
                 this.anatomy.addRandomizedCell(state, c, r);
             }
         }
-        if (this.calcRandomChance(Hyperparams.changeProb)){
-            let cell = this.anatomy.getRandomCell();
-            let state = CellStates.getRandomLivingType();
+        else if (choice <= Hyperparams.addProb + Hyperparams.changeProb){
+            // change cell
+            var cell = this.anatomy.getRandomCell();
+            var state = CellStates.getRandomLivingType();
+            // console.log("change cell", state)
             this.anatomy.replaceCell(state, cell.loc_col, cell.loc_row);
             mutated = true;
         }
-        if (this.calcRandomChance(Hyperparams.removeProb)){
+        else if (choice <= Hyperparams.addProb + Hyperparams.changeProb + Hyperparams.removeProb){
+            // remove cell
+            // console.log("remove cell")
+
             if(this.anatomy.cells.length > 1) {
-                let cell = this.anatomy.getRandomCell();
+                var cell = this.anatomy.getRandomCell();
                 mutated = this.anatomy.removeCell(cell.loc_col, cell.loc_row);
             }
         }
         return mutated;
-    }
-
-    calcRandomChance(prob) {
-        return (Math.random() * 100) < prob;
     }
 
     attemptMove() {
@@ -236,13 +242,14 @@ class Organism {
         return cell != null && (cell.state == CellStates.empty || cell.owner == this || cell.owner == parent || cell.state == CellStates.food);
     }
 
-    isClear(col, row, rotation=this.rotation) {
+    isClear(col, row, rotation=this.rotation, ignore_armor=false) {
         for(var loccell of this.anatomy.cells) {
             var cell = this.getRealCell(loccell, col, row, rotation);
             if (cell==null) {
                 return false;
             }
-            if (cell.owner==this || cell.state==CellStates.empty || (!Hyperparams.foodBlocksReproduction && cell.state==CellStates.food)){
+            // console.log(cell.owner == this)
+            if (cell.owner==this || cell.state==CellStates.empty || (!Hyperparams.foodBlocksReproduction && cell.state==CellStates.food) || (ignore_armor && loccell.state==CellStates.armor && cell.state==CellStates.food)){
                 continue;
             }
             return false;

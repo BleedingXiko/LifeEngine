@@ -6,19 +6,19 @@ const CellStates = require('../Organism/Cell/CellStates');
 const EnvironmentController = require('../Controllers/EnvironmentController');
 const Hyperparams = require('../Hyperparameters.js');
 const FossilRecord = require('../Stats/FossilRecord');
-const WorldConfig = require('../WorldConfig');
 
 class WorldEnvironment extends Environment{
     constructor(cell_size) {
         super();
         this.renderer = new Renderer('env-canvas', 'env', cell_size);
         this.controller = new EnvironmentController(this, this.renderer.canvas);
-        this.num_rows = Math.ceil(this.renderer.height / cell_size);
-        this.num_cols = Math.ceil(this.renderer.width / cell_size);
-        this.grid_map = new GridMap(this.num_cols, this.num_rows, cell_size);
+        var grid_rows = Math.ceil(this.renderer.height / cell_size);
+        var grid_cols = Math.ceil(this.renderer.width / cell_size);
+        this.grid_map = new GridMap(grid_cols, grid_rows, cell_size);
         this.organisms = [];
         this.walls = [];
         this.total_mutability = 0;
+        this.auto_reset = true;
         this.largest_cell_count = 0;
         this.reset_count = 0;
         this.total_ticks = 0;
@@ -37,15 +37,19 @@ class WorldEnvironment extends Environment{
         if (Hyperparams.foodDropProb > 0) {
             this.generateFood();
         }
+        if (Hyperparams.foodDecayRate > 0) {
+            this.decayFood();
+        }
         this.removeOrganisms(to_remove);
         this.total_ticks ++;
         if (this.total_ticks % this.data_update_rate == 0) {
             FossilRecord.updateData();
+            // this.density(); // debugging
         }
     }
 
     render() {
-        if (WorldConfig.headless) {
+        if (Hyperparams.headless) {
             this.renderer.cells_to_render.clear();
             return;
         }
@@ -58,18 +62,13 @@ class WorldEnvironment extends Environment{
     }
 
     removeOrganisms(org_indeces) {
-        let start_pop = this.organisms.length;
         for (var i of org_indeces.reverse()){
             this.total_mutability -= this.organisms[i].mutability;
             this.organisms.splice(i, 1);
         }
-        if (this.organisms.length === 0 && start_pop > 0) {
-            if (WorldConfig.auto_pause)
-                $('.pause-button')[0].click();
-            else if(WorldConfig.auto_reset) {
-                this.reset_count++;
-                this.reset(false);
-            }
+        if (this.organisms.length == 0 && this.auto_reset){
+            this.reset_count++;
+            this.reset();
         }
     }
 
@@ -109,8 +108,7 @@ class WorldEnvironment extends Environment{
 
     clearWalls() {
         for(var wall of this.walls){
-            let wcell = this.grid_map.cellAt(wall.col, wall.row);
-            if (wcell && wcell.state == CellStates.wall)
+            if (this.grid_map.cellAt(wall.col, wall.row).state == CellStates.wall)
                 this.changeCell(wall.col, wall.row, CellStates.empty, null);
         }
     }
@@ -136,19 +134,54 @@ class WorldEnvironment extends Environment{
         }
     }
 
-    reset(confirm_reset=true, reset_life=true) {
-        if (confirm_reset && !confirm('The current environment will be lost. Proceed?'))
-            return false;
+    /** Probabilistically remove food from the map.
+     */
+    decayFood() {
+        // 1.5 is empirically chosen to try to balance such that when generate == decay, there is about a
+        // 50/50 distribution of food/empty
+        let prob =1.5 * Hyperparams.foodDecayRate / (this.grid_map.cols * this.grid_map.rows);
+        // console.log(prob)
+        let decay = (cell) => {
+            if (Math.random() <= prob) {
+                if (cell.state.name === 'food') {
+                    this.changeCell(cell.col, cell.row, CellStates.empty, null);
+                }
+            }
+        }
+        this.grid_map.map(decay);
+    }
 
+    /** Report on density of cells on the map for debugging purposes.
+     */
+    density() {
+        this._foodCount = 0;
+        this._emptyCount = 0;
+        this._otherCount = 0;
+        let analyze = (cell) => {
+            switch (cell.state.name) {
+                case 'empty':
+                    this._emptyCount++;
+                    break;
+                case 'food':
+                    this._foodCount++;
+                    break;
+                default:
+                    this._otherCount++;
+                    break;
+            }
+        }
+        this.grid_map.map(analyze);
+        console.log(this._foodCount/this._emptyCount, this._foodCount, this._emptyCount, this._otherCount)
+    }
+
+    reset() {
         this.organisms = [];
-        this.grid_map.fillGrid(CellStates.empty, !WorldConfig.clear_walls_on_reset);
+        this.grid_map.fillGrid(CellStates.empty);
         this.renderer.renderFullGrid(this.grid_map.grid);
         this.total_mutability = 0;
         this.total_ticks = 0;
         FossilRecord.clear_record();
-        if (reset_life)
-            this.OriginOfLife();
-        return true;
+        this.OriginOfLife();
     }
 
     resizeGridColRow(cell_size, cols, rows) {
@@ -160,9 +193,9 @@ class WorldEnvironment extends Environment{
     resizeFillWindow(cell_size) {
         this.renderer.cell_size = cell_size;
         this.renderer.fillWindow('env');
-        this.num_cols = Math.ceil(this.renderer.width / cell_size);
-        this.num_rows = Math.ceil(this.renderer.height / cell_size);
-        this.grid_map.resize(this.num_cols, this.num_rows, cell_size);
+        var cols = Math.ceil(this.renderer.width / cell_size);
+        var rows = Math.ceil(this.renderer.height / cell_size);
+        this.grid_map.resize(cols, rows, cell_size);
     }
 }
 
