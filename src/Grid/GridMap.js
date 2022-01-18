@@ -21,20 +21,14 @@ class GridMap {
         }
     }
 
-    map(func) {
+    fillGrid(state) {
         for (var col of this.grid) {
             for (var cell of col) {
-                func(cell);
+                cell.setType(state);
+                cell.owner = null;
+                cell.cell_owner = null;
             }
         }
-    }
-
-    fillGrid(state) {
-        this.map((cell) => {
-            cell.setType(state);
-            cell.owner = null;
-            cell.cell_owner = null;
-        })
     }
 
     cellAt(col, row) {
