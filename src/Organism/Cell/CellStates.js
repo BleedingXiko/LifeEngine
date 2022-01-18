@@ -73,6 +73,28 @@ class Eye extends CellState {
         ctx.setTransform(1, 0, 0, 1, 0, 0);
     }
 }
+class Camo extends CellState {
+    constructor() {
+        super('camo');
+    }
+}
+class Healer extends CellState {
+    constructor() {
+        super('healer');
+        this.cross = 'black';
+    }
+    render(ctx, cell, size) {
+        ctx.fillStyle = this.color;
+        ctx.fillRect(cell.x, cell.y, size, size);
+        if(size < 5)
+            return;
+        var fifth = size / 5;
+        ctx.fillStyle = this.cross;
+        ctx.fillRect(cell.x + 2 * fifth, cell.y, fifth, size);
+        ctx.fillRect(cell.x, cell.y + 2 * fifth, size, fifth);
+
+    }
+}
 
 const CellStates = {
     empty: new Empty(),
@@ -84,9 +106,11 @@ const CellStates = {
     killer: new Killer(),
     armor: new Armor(),
     eye: new Eye(),
+    camo: new Camo(),
+    healer: new Healer(),
     defineLists() {
-        this.all = [this.empty, this.food, this.wall, this.mouth, this.producer, this.mover, this.killer, this.armor, this.eye]
-        this.living = [this.mouth, this.producer, this.mover, this.killer, this.armor, this.eye];
+        this.all = [this.empty, this.food, this.wall, this.mouth, this.producer, this.mover, this.killer, this.armor, this.eye, this.camo, this.healer]
+        this.living = [this.mouth, this.producer, this.mover, this.killer, this.armor, this.eye, this.camo, this.healer];
     },
     getRandomName: function() {
         return this.all[Math.floor(Math.random() * this.all.length)].name;
@@ -95,7 +119,6 @@ const CellStates = {
         return this.living[Math.floor(Math.random() * this.living.length)];
     }
 }
-
 CellStates.defineLists();
 
 module.exports = CellStates;

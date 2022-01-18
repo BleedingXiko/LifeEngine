@@ -41,9 +41,7 @@ const FossilRecord = {
                 if (species.cumulative_pop < this.min_pop) {
                     return false;
                 }
-                // disabled for now, causes memory problems on long runs
-                // this.extinct_species.push(s);
-                
+                this.extinct_species.push(s);
                 // console.log("Extant species:", this.extant_species.length)
                 // console.log("Extinct species:", this.extinct_species.length)
                 return true;
@@ -82,7 +80,8 @@ const FossilRecord = {
         this.species_counts.push(this.extant_species.length);
         this.av_mut_rates.push(this.env.averageMutability());
         this.calcCellCountAverages();
-        while (this.tick_record.length > this.record_size_limit) {
+
+        if (this.tick_record.length > this.record_size_limit) {
             this.tick_record.shift();
             this.pop_counts.shift();
             this.species_counts.shift();
