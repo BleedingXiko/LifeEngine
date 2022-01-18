@@ -93,10 +93,6 @@ class EditorController extends CanvasController{
         $('#move-range-edit').change ( function() {
             this.env.organism.move_range = parseInt($('#move-range-edit').val());
         }.bind(this));
-		
-        $('#mutation-rate-edit').change ( function() {
-            this.env.organism.mutability = parseInt($('#mutation-rate-edit').val());
-        }.bind(this));
         $('#observation-type-edit').change ( function() {
             this.setBrainEditorValues($('#observation-type-edit').val());
             this.setBrainDetails();
@@ -112,14 +108,6 @@ class EditorController extends CanvasController{
     clearDetailsPanel() {
         $('#organism-details').css('display', 'none');
         $('#edit-organism-details').css('display', 'none');
-        $('#randomize-organism-details').css('display', 'none');
-    }
-
-    refreshDetailsPanel() {
-        if (this.mode === Modes.Edit)
-            this.setEditorPanel();
-        else
-            this.setDetailsPanel();
     }
 
     setDetailsPanel() {
@@ -129,8 +117,7 @@ class EditorController extends CanvasController{
         $('.cell-count').text("Cell count: "+org.anatomy.cells.length);
         $('#move-range').text("Move Range: "+org.move_range);
         $('#mutation-rate').text("Mutation Rate: "+org.mutability);
-       
-		if (Hyperparams.useGlobalMutability) {
+        if (Hyperparams.useGlobalMutability) {
             $('#mutation-rate').css('display', 'none');
         }
         else {
@@ -153,14 +140,6 @@ class EditorController extends CanvasController{
         $('.cell-count').text("Cell count: "+org.anatomy.cells.length);
         if (this.setMoveRangeVisibility()){
             $('#move-range-edit').val(org.move_range);
-        }
-
-		$('#mutation-rate-edit').val(org.mutability);
-        if (Hyperparams.useGlobalMutability) {
-			$('#mutation-rate-cont').css('display', 'none');
-        }
-        else {
-            $('#mutation-rate-cont').css('display', 'block');
         }
         
         if (this.setBrainPanelVisibility()){
@@ -213,11 +192,6 @@ class EditorController extends CanvasController{
         $('#observation-type-edit').val(name);
         var reaction = this.env.organism.brain.decisions[name];
         $('#reaction-edit').val(reaction);
-    }
-
-    setRandomizePanel() {
-        this.clearDetailsPanel();
-        $('#randomize-organism-details').css('display', 'block');
     }
 }
 
