@@ -22,6 +22,9 @@ class Organism {
         this.move_range = 4;
         this.ignore_brain_for = 0;
         this.mutability = 5;
+        this.addProb = 33;
+        this.changeProb = 33;
+        this.removeProb = 33;
         this.damage = 0;
         this.brain = new Brain(this);
         this.healRate = 5; // 1 / healRate chance of healing neighbors every turn.
@@ -33,6 +36,9 @@ class Organism {
     inherit(parent) {
         this.move_range = parent.move_range;
         this.mutability = parent.mutability;
+        this.addProb = parent.addProb
+        this.removeProb = parent.removeProb
+        this.changeProb = parent.changeProb
         this.species = parent.species;
         // this.birth_distance = parent.birth_distance;
         for (var c of parent.anatomy.cells){
@@ -60,6 +66,23 @@ class Organism {
         return this.anatomy.cells.length;
     }
 
+    balanceMutationProbs(choice) {
+        if (choice == 1) {
+            var remaining = 100 - this.addProb;
+            this.changeProb = remaining/2;
+            this.removeProb = remaining/2;
+        }
+        else if (choice == 2) {
+            var remaining = 100 - this.changeProb;
+            this.addProb = remaining/2;
+            this.removeProb = remaining/2;
+        }
+        else {
+            var remaining = 100 - this.removeProb;
+            this.changeProb = remaining/2;
+            this.addProb = remaining/2;
+        }
+    }
     reproduce() {
         //produce mutated child
         //check nearby locations (is there room and a direct path)
@@ -72,9 +95,10 @@ class Organism {
             prob = Hyperparams.globalMutability;
         }
         else {
-            //mutate the mutability
-            if (Math.random() <= 0.5)
+            //mutate the mutability and mutation
+            if (Math.random() <= 0.5){
                 org.mutability++;
+            }
             else{ 
                 org.mutability--;
                 if (org.mutability < 1)
@@ -126,7 +150,7 @@ class Organism {
     mutate() {
         var choice = Math.floor(Math.random() * 100);
         var mutated = false;
-        if (choice <= Hyperparams.addProb) {
+        if (choice <= this.addProb) {
             // add cell
             // console.log("add cell")
 
@@ -137,24 +161,30 @@ class Organism {
             var r = branch.loc_row+growth_direction[1];
             if (this.anatomy.canAddCellAt(c, r)){
                 mutated = true;
+                this.addProb += this.mutability/2;
+                this.balanceMutationProbs(1);
                 this.anatomy.addRandomizedCell(state, c, r);
             }
         }
-        else if (choice <= Hyperparams.addProb + Hyperparams.changeProb){
+        else if (choice <= this.addProb + this.changeProb){
             // change cell
             var cell = this.anatomy.getRandomCell();
             var state = CellStates.getRandomLivingType();
-            // console.log("change cell", state)
+           // console.log("change cell", state)
             this.anatomy.replaceCell(state, cell.loc_col, cell.loc_row);
             mutated = true;
+            this.changeProb += this.mutability/2;
+            this.balanceMutationProbs(2);
         }
-        else if (choice <= Hyperparams.addProb + Hyperparams.changeProb + Hyperparams.removeProb){
+        else if (choice <= this.addProb + this.changeProb + this.removeProb){
             // remove cell
-            // console.log("remove cell")
+           // console.log("remove cell")
 
             if(this.anatomy.cells.length > 1) {
                 var cell = this.anatomy.getRandomCell();
                 mutated = this.anatomy.removeCell(cell.loc_col, cell.loc_row);
+                this.removeProb += this.mutability/2;
+                this.balanceMutationProbs(3);
             }
         }
         return mutated;
@@ -293,6 +323,15 @@ class Organism {
 
     update() {
         this.lifetime++;
+        if (this.addProb < 1) {
+            this.addProb++;
+        }
+        if (this.changeProb < 1) {
+            this.changeProb++;
+        }
+        if (this.removeProb < 1) {
+            this.removeProb++;
+        }
         if (this.lifetime > this.lifespan()) {
             this.die();
             return this.living;

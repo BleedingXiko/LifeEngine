@@ -221,9 +221,6 @@ class ControlPanel {
             $('#offspring-rot').prop('checked', Hyperparams.offspringRotate);
             $('#insta-kill').prop('checked', Hyperparams.instaKill);
             $('#evolved-mutation').prop('checked', !Hyperparams.useGlobalMutability);
-            $('#add-prob').val(Hyperparams.addProb);
-            $('#change-prob').val(Hyperparams.changeProb);
-            $('#remove-prob').val(Hyperparams.removeProb);
             $('#movers-produce').prop('checked', Hyperparams.moversCanProduce);
             $('#food-blocks').prop('checked', Hyperparams.foodBlocksReproduction);
             $('#food-drop-rate').val(Hyperparams.foodDropProb);

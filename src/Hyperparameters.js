@@ -14,9 +14,6 @@ const Hyperparams = {
 
         this.useGlobalMutability = false;
         this.globalMutability = 5;
-        this.addProb = 33;
-        this.changeProb = 33;
-        this.removeProb = 33;
         
         this.moversCanRotate = true;
         this.offspringRotate = true;

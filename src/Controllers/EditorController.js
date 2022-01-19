@@ -122,6 +122,10 @@ class EditorController extends CanvasController{
         $('.cell-count').text("Cell count: "+org.anatomy.cells.length);
         $('#move-range').text("Move Range: "+org.move_range);
         $('#mutation-rate').text("Mutation Rate: "+org.mutability);
+        $('#add-prob').text("Add prob: "+org.addProb);
+        $('#change-prob').text("Change prob: "+org.changeProb);
+        $('#remove-prob').text("Remove prob: "+org.removeProb);
+
         if (Hyperparams.useGlobalMutability) {
             $('#mutation-rate').css('display', 'none');
         }
