@@ -118,6 +118,34 @@ class Organism {
             else {
                 mutated = org.mutate();
             }
+            var amount;
+            //mutate the add probability
+            amount = Math.random()*org.mutability - org.mutability/2;
+            org.addProb += amount;
+            org.addProb = Math.min(Math.max(org.addProb, 0), 100);
+            org.changeProb -= amount/2;
+            org.removeProb -= amount/2;
+            //fix the probabilities (floating point errors)
+            org.changeProb = Math.min(Math.max(100 - org.addProb - org.removeProb, 0), 100);
+            org.removeProb = Math.min(Math.max(100 - org.addProb - org.changeProb, 0), 100);
+            //mutate the change probability
+            amount = Math.random()*org.mutability - org.mutability/2;
+            org.changeProb += amount;
+            org.changeProb = Math.min(Math.max(org.changeProb, 0), 100);
+            org.addProb -= amount/2;
+            org.removeProb -= amount/2;
+            //fix the probabilities (floating point errors)
+            org.addProb = Math.min(Math.max(100 - org.changeProb - org.removeProb, 0), 100);
+            org.removeProb = Math.min(Math.max(100 - org.changeProb - org.addProb, 0), 100);
+            //mutate the remove probability
+            amount = Math.random()*org.mutability - org.mutability/2;
+            org.removeProb += amount;
+            org.removeProb = Math.min(Math.max(org.removeProb, 0), 100);
+            org.addProb -= amount/2;
+            org.changeProb -= amount/2;
+            //fix the probabilities (floating point errors)
+            org.addProb = Math.min(Math.max(100 - org.removeProb - org.changeProb, 0), 100);
+            org.changeProb = Math.min(Math.max(100 - org.removeProb - org.addProb, 0), 100);
         }
 
         var direction = Directions.getRandomScalar();
@@ -156,8 +184,6 @@ class Organism {
             let r = branch.loc_row+growth_direction[1];
             if (this.anatomy.canAddCellAt(c, r)){
                 mutated = true;
-                this.addProb += 2;
-                this.balanceMutationProbs(1)
                 this.anatomy.addRandomizedCell(state, c, r);
             }
         }
@@ -166,16 +192,12 @@ class Organism {
             let cell = this.anatomy.getRandomCell();
             let state = CellStates.getRandomLivingType();
             this.anatomy.replaceCell(state, cell.loc_col, cell.loc_row);
-            this.changeProb += 2;
-            this.balanceMutationProbs(2)
             mutated = true;
         }
         if (this.calcRandomChance(this.removeProb)){
             // Remove Cell
             if(this.anatomy.cells.length > 1) {
                 let cell = this.anatomy.getRandomCell();
-                this.removeProb += 2;
-                this.balanceMutationProbs(3)
                 mutated = this.anatomy.removeCell(cell.loc_col, cell.loc_row);
             }
         }
