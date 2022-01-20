@@ -77,6 +77,11 @@ class EditorController extends CanvasController{
                 case "eye":
                     self.edit_cell_type = CellStates.eye;
                     break;
+                case "camo":
+                    self.edit_cell_type = CellStates.camo;
+                    break;
+                case "healer":
+                    self.edit_cell_type = CellStates.healer;
             }
             $(".cell-type" ).css( "border-color", "black" );
             var selected = '#'+this.id+'.cell-type';
@@ -129,6 +134,9 @@ class EditorController extends CanvasController{
         $('.cell-count').text("Cell count: "+org.anatomy.cells.length);
         $('#move-range').text("Move Range: "+org.move_range);
         $('#mutation-rate').text("Mutation Rate: "+org.mutability);
+        $('#add-prob').text("Add prob: "+org.addProb);
+        $('#change-prob').text("Change prob: "+org.changeProb);
+        $('#remove-prob').text("Remove prob: "+org.removeProb);
        
 		if (Hyperparams.useGlobalMutability) {
             $('#mutation-rate').css('display', 'none');

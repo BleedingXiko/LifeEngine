@@ -22,6 +22,10 @@ class Organism {
         this.move_range = 4;
         this.ignore_brain_for = 0;
         this.mutability = 5;
+        this.healRate = 5; // 1 / healRate chance of healing neighbors every turn.
+        this.addProb = 33;
+        this.changeProb = 33;
+        this.removeProb = 33;
         this.damage = 0;
         this.brain = new Brain(this);
         if (parent != null) {
@@ -32,6 +36,9 @@ class Organism {
     inherit(parent) {
         this.move_range = parent.move_range;
         this.mutability = parent.mutability;
+        this.addProb = parent.addProb
+        this.removeProb = parent.removeProb
+        this.changeProb = parent.changeProb
         this.species = parent.species;
         // this.birth_distance = parent.birth_distance;
         for (var c of parent.anatomy.cells){
@@ -56,6 +63,23 @@ class Organism {
 
     maxHealth() {
         return this.anatomy.cells.length;
+    }
+    balanceMutationProbs(choice) {
+        if (choice == 1) {
+            var remaining = 100 - this.addProb;
+            this.changeProb = remaining/2;
+            this.removeProb = remaining/2;
+        }
+        else if (choice == 2) {
+            var remaining = 100 - this.changeProb;
+            this.addProb = remaining/2;
+            this.removeProb = remaining/2;
+        }
+        else {
+            var remaining = 100 - this.removeProb;
+            this.changeProb = remaining/2;
+            this.addProb = remaining/2;
+        }
     }
 
     reproduce() {
@@ -123,7 +147,8 @@ class Organism {
 
     mutate() {
         let mutated = false;
-        if (this.calcRandomChance(Hyperparams.addProb)) {
+        if (this.calcRandomChance(this.addProb)) {
+            // Add Cell
             let branch = this.anatomy.getRandomCell();
             let state = CellStates.getRandomLivingType();//branch.state;
             let growth_direction = Neighbors.all[Math.floor(Math.random() * Neighbors.all.length)]
@@ -131,18 +156,26 @@ class Organism {
             let r = branch.loc_row+growth_direction[1];
             if (this.anatomy.canAddCellAt(c, r)){
                 mutated = true;
+                this.addProb += 2;
+                this.balanceMutationProbs(1)
                 this.anatomy.addRandomizedCell(state, c, r);
             }
         }
-        if (this.calcRandomChance(Hyperparams.changeProb)){
+        if (this.calcRandomChance(this.changeProb)){
+            // Change Cell
             let cell = this.anatomy.getRandomCell();
             let state = CellStates.getRandomLivingType();
             this.anatomy.replaceCell(state, cell.loc_col, cell.loc_row);
+            this.changeProb += 2;
+            this.balanceMutationProbs(2)
             mutated = true;
         }
-        if (this.calcRandomChance(Hyperparams.removeProb)){
+        if (this.calcRandomChance(this.removeProb)){
+            // Remove Cell
             if(this.anatomy.cells.length > 1) {
                 let cell = this.anatomy.getRandomCell();
+                this.removeProb += 2;
+                this.balanceMutationProbs(3)
                 mutated = this.anatomy.removeCell(cell.loc_col, cell.loc_row);
             }
         }
@@ -248,6 +281,13 @@ class Organism {
             return false;
         }
         return true;
+    }
+
+    heal() {
+        this.damage--;
+        if (this.damage < 0) {
+            this.damage = 0;
+        }
     }
 
     harm() {

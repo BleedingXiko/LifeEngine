@@ -66,7 +66,7 @@ class EyeCell extends BodyCell{
             col+=addCol;
             row+=addRow;
             cell = env.grid_map.cellAt(col, row);
-            if (cell == null) {
+            if (cell == null || cell.state == CellStates.camo) {
                 break;
             }
             if (cell.state != CellStates.empty){

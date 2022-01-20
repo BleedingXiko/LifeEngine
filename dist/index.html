@@ -65,18 +65,12 @@
 							<div class='cell-legend-type-living' id='mover' title="Mover: Allows for movement and rotation."></div>
 							<div class='cell-legend-type-living' id='killer' title="Killer: Harms organisms in adjacent cells."></div>
 							<div class='cell-legend-type-living' id='armor' title="Armor: Negates affects of killer cell."></div>
+							<div class='cell-legend-type-living' id='camo' title="Camo: Allows for oganisms to get targeted less."></div>
+							<div class='cell-legend-type-living' id='healer' title="Healer: Allows for oganisms revert damage taken."></div>
 							<div class='cell-legend-type-living' id='eye' title="Eye: Observes cells and decides movement."></div>
 							<div class='cell-legend-type' id='food' title="Food: Not part of an organism. Once an organism has eaten enough food, it will reproduce."></div>
 							<div class='cell-legend-type' id='wall' title="Wall: Not part of an organism. Blocks movement and reproduction."></div>
 						</div><br>
-					</div>
-					<div class='right-half'>
-						<iframe id="video" src="https://www.youtube.com/embed/iSAKEnRfles"></iframe>
-					</div>
-					<div class='icon-links'>
-						<a href=https://github.com/MaxRobinsonTheGreat/EvolutionSimulatorV2 target="_blank" title='View the code'><i class="fa fa-github"></i></a>
-						<a href="https://discord.com/invite/ZsrAAByEnr" target="_blank" title='Join the growing community'><i class="fab fa-discord"></i></a>
-						<a href="https://twitter.com/max_romana" target="_blank"><i class="fa fa-twitter"></i></a>
 					</div>
 				</div>
 
@@ -96,11 +90,13 @@
 								<div class='cell-type' id='mouth' title="Mouth: Eats adjacent food."></div>
 								<div class='cell-type' id='producer' title="Producer: Produces adjacent food."></div>
 								<div class='cell-type' id='mover' title="Mover: Allows for movement and rotation."></div>
+								<div class='cell-type' id='camo' title="Camo: Allows for oganisms to get targeted less."></div>
 							</div>
 							<div style='grid-column: 2;'>
 								<div class='cell-type' id='killer' title="Killer: Harms organisms in adjacent cells."></div>
 								<div class='cell-type' id='armor' title="Armor: Negates affects of killer cell."></div>
 								<div class='cell-type' id='eye' title="Eye: Looks for cells to move away from or towards. Click again on a placed cell to rotate"></div>
+								<div class='cell-type' id='healer' title="Healer: Allows for oganisms revert damage taken."></div>
 							</div>
 
 							<button id='clear-editor'>Clear</button>
@@ -115,8 +111,10 @@
 							<p class='cell-count'>Cell count: </p>
 							<p id='move-range'>Move Range: </p>
 							<p id='mutation-rate'>Mutation Rate: </p>
-							<br>
-						
+							<h4 title='When an organism mutates, it can choose from one of the following mutation types.'>Mutation Type Probabilities</h4>
+							<p id='add-prob'>Add cell: </p>
+							<p id='change-prob'>Change cell: </p>
+							<p id='remove-prob'>Remove cell: </p>
 							<div class='brain-details'>
 								<h4>Brain</h4>
 								<p class='chase-types'>Move Towards: food</p>
@@ -147,6 +145,8 @@
 									<option value="killer">killer</option>
 									<option value="armor">armor</option>
 									<option value="eye">eye</option>
+									<option value="healer">healer</option>
+									<option value="camo">camo</option>
 								</select>
 
 								<label for="reaction-edit">Reaction: </label>
