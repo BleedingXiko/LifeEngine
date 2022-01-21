@@ -36,9 +36,10 @@ class Organism {
     inherit(parent) {
         this.move_range = parent.move_range;
         this.mutability = parent.mutability;
-        this.addProb = parent.addProb
-        this.removeProb = parent.removeProb
-        this.changeProb = parent.changeProb
+        this.addProb = parent.addProb;
+        this.removeProb = parent.removeProb;
+        this.changeProb = parent.changeProb;
+        this.healRate = parent.healRate;
         this.species = parent.species;
         // this.birth_distance = parent.birth_distance;
         for (var c of parent.anatomy.cells){
