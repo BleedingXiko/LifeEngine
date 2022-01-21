@@ -36,10 +36,9 @@ class Organism {
     inherit(parent) {
         this.move_range = parent.move_range;
         this.mutability = parent.mutability;
-        this.addProb = parent.addProb;
-        this.removeProb = parent.removeProb;
-        this.changeProb = parent.changeProb;
-        this.healRate = parent.healRate;
+        this.addProb = parent.addProb
+        this.removeProb = parent.removeProb
+        this.changeProb = parent.changeProb
         this.species = parent.species;
         // this.birth_distance = parent.birth_distance;
         for (var c of parent.anatomy.cells){
@@ -96,17 +95,12 @@ class Organism {
         }
         else {
             //mutate the mutability
-            if (Math.random() <= 0.5){
+            if (Math.random() <= 0.5)
                 org.mutability++;
-                org.healRate++;
-            }
             else{ 
                 org.mutability--;
-                org.healRate--;
                 if (org.mutability < 1)
                     org.mutability = 1;
-                if (org.healRate < 1)
-                    org.healRate = 1;
             }
         } 
         var mutated = false;
