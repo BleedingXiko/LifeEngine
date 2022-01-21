@@ -5,9 +5,9 @@ const Hyperparams = {
     setDefaults: function() {
         this.lifespanMultiplier = 100;
         this.foodProdProb = 5;
-        this.killableNeighbors = Neighbors.adjacent;
-        this.edibleNeighbors = Neighbors.all;
-        this.growableNeighbors = Neighbors.all;
+        this.killableNeighbors = Neighbors.all;
+        this.edibleNeighbors = Neighbors.adjacent;
+        this.growableNeighbors = Neighbors.adjacent;
         this.healableNeighbors = Neighbors.all;
 
         this.useGlobalMutability = false;
