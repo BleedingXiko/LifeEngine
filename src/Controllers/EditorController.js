@@ -146,6 +146,8 @@ class EditorController extends CanvasController{
         
         $('.cell-count').text("Cell count: "+org.anatomy.cells.length);
         $('#move-range').text("Move Range: "+org.move_range);
+        heal-rate
+        $('#heal-rate').text("Heal Rate: "+org.healRate);
         $('#mutation-rate').text("Mutation Rate: "+org.mutability);
         $('#mutation-probs').text(" (Add: "+org.addProb.toFixed(2)+", Change: "+org.changeProb.toFixed(2)+", Remove: "+org.removeProb.toFixed(2)+")");
        

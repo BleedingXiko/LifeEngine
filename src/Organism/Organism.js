@@ -95,12 +95,17 @@ class Organism {
         }
         else {
             //mutate the mutability
-            if (Math.random() <= 0.5)
+            if (Math.random() <= 0.5){
                 org.mutability++;
+                org.healRate++;
+            }
             else{ 
                 org.mutability--;
+                org.healRate--;
                 if (org.mutability < 1)
                     org.mutability = 1;
+                if (org.healRate < 1)
+                    org.healRate = 1;
             }
         } 
         var mutated = false;
