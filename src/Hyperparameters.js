@@ -6,9 +6,9 @@ const Hyperparams = {
         this.lifespanMultiplier = 100;
         this.foodProdProb = 5;
         this.killableNeighbors = Neighbors.adjacent;
-        this.edibleNeighbors = Neighbors.adjacent;
-        this.growableNeighbors = Neighbors.adjacent;
-        this.healableNeighbors = Neighbors.adjacent;
+        this.edibleNeighbors = Neighbors.all;
+        this.growableNeighbors = Neighbors.all;
+        this.healableNeighbors = Neighbors.all;
 
         this.useGlobalMutability = false;
         this.globalMutability = 5;
