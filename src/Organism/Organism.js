@@ -31,24 +31,24 @@ class Organism {
 
         this.weight = Math.random();
         this.bias = Math.random();
-        this.input = 2;
-        this.output = .3
+        this.input = this.mutability;
+        this.output = this.input * this.weight + this.bias
         if (parent != null) {
             this.inherit(parent);
         }
     }
 
     inherit(parent) {
+        this.weight = parent.weight;
+        this.bias += Math.random();
+        this.input = parent.output;
+        this.output = this.input * this.weight + this.bias
         this.move_range = parent.move_range;
         this.mutability = parent.mutability;
         this.addProb = parent.addProb
         this.removeProb = parent.removeProb
         this.changeProb = parent.changeProb
         this.species = parent.species;
-        this.bias += parent.weight;
-        this.weight = parent.weight + bias;
-        this.input = parent.output;
-        this.output = this.input * this.weight + this.bias
         // this.birth_distance = parent.birth_distance;
         for (var c of parent.anatomy.cells){
             //deep copy parent cells
