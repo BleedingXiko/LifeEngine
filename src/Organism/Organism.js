@@ -31,7 +31,7 @@ class Organism {
 
         this.weight = Math.random();
         this.bias = Math.random();
-        this.input = this.mutability;
+        this.input = Math.random();
         this.output = this.input * this.weight + this.bias
         if (parent != null) {
             this.inherit(parent);
@@ -40,9 +40,9 @@ class Organism {
 
     inherit(parent) {
         this.weight = parent.weight;
-        this.bias += Math.random();
+        this.bias = parent.bias;
         this.input = parent.output;
-        this.output = this.input * this.weight + this.bias
+        this.output = parent.input * this.weight + this.bias
         this.move_range = parent.move_range;
         this.mutability = parent.mutability;
         this.addProb = parent.addProb
