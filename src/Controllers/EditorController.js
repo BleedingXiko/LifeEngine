@@ -146,8 +146,8 @@ class EditorController extends CanvasController{
         
         $('.cell-count').text("Cell count: "+org.anatomy.cells.length);
         $('#move-range').text("Move Range: "+org.move_range);
-        $('#input').text("Move Range: "+org.move_range);
-        $('#bias').text("Input: "+org.bias);
+        $('#input').text("Input: "+org.input);
+        $('#bias').text("Bias: "+org.bias);
         $('#weight').text("Weight: "+org.weight);
         $('#output').text("Output: "+org.output);
         $('#mutation-rate').text("Mutation Rate: "+org.mutability);
