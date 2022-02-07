@@ -28,12 +28,21 @@ class Organism {
         this.removeProb = 33;
         this.damage = 0;
         this.brain = new Brain(this);
+
+        this.weight = Math.random();
+        this.bias = Math.random();
+        this.input = Math.random();
+        this.output = this.input * this.weight + this.bias
         if (parent != null) {
             this.inherit(parent);
         }
     }
 
     inherit(parent) {
+        this.weight = parent.weight;
+        this.bias = parent.bias;
+        this.input = parent.output;
+        this.output = parent.input * this.weight + this.bias
         this.move_range = parent.move_range;
         this.mutability = parent.mutability;
         this.addProb = parent.addProb
@@ -63,23 +72,6 @@ class Organism {
 
     maxHealth() {
         return this.anatomy.cells.length;
-    }
-    balanceMutationProbs(choice) {
-        if (choice == 1) {
-            var remaining = 100 - this.addProb;
-            this.changeProb = remaining/2;
-            this.removeProb = remaining/2;
-        }
-        else if (choice == 2) {
-            var remaining = 100 - this.changeProb;
-            this.addProb = remaining/2;
-            this.removeProb = remaining/2;
-        }
-        else {
-            var remaining = 100 - this.removeProb;
-            this.changeProb = remaining/2;
-            this.addProb = remaining/2;
-        }
     }
 
     reproduce() {
