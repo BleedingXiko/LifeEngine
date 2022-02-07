@@ -39,16 +39,16 @@ class Organism {
     }
 
     inherit(parent) {
-        this.weight = parent.weight;
-        this.bias = parent.bias;
-        this.input = parent.output;
-        this.output = this.input * this.weight + this.bias
         this.move_range = parent.move_range;
         this.mutability = parent.mutability;
         this.addProb = parent.addProb
         this.removeProb = parent.removeProb
         this.changeProb = parent.changeProb
         this.species = parent.species;
+        this.weight = parent.weight;
+        this.bias = parent.bias + Math.random();
+        this.input = parent.output;
+        this.output = this.input * this.weight + this.bias
         // this.birth_distance = parent.birth_distance;
         for (var c of parent.anatomy.cells){
             //deep copy parent cells
