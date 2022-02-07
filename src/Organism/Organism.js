@@ -31,8 +31,8 @@ class Organism {
 
         this.weight = Math.random();
         this.bias = Math.random();
-        this.input = this.mutability;
-        this.output = (this.input * this.weight) + this.bias
+        this.input = 2;
+        this.output = .3
         if (parent != null) {
             this.inherit(parent);
         }
