@@ -153,7 +153,7 @@ class EditorController extends CanvasController{
             $('#mutation-rate').css('display', 'none');
         }
         else {
-            $('#mutation-rate').css('display', 'block');
+            $('#mutation-rate').css('display', 'inline');
         }
 
         this.setMoveRangeVisibility();
@@ -174,11 +174,11 @@ class EditorController extends CanvasController{
             $('#move-range-edit').val(org.move_range);
         }
 
+		$('#mutation-rate-edit').val(org.mutability);
         $('#mutation-add-edit').val(org.addProb);
         $('#mutation-change-edit').val(org.changeProb);
         $('#mutation-remove-edit').val(org.removeProb);
-		$('#mutation-rate-edit').val(org.mutability);
-        
+
         if (Hyperparams.useGlobalMutability) {
 			$('#mutation-rate-cont').css('display', 'none');
         }
