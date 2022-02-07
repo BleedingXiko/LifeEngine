@@ -45,7 +45,7 @@ class Organism {
         this.removeProb = parent.removeProb
         this.changeProb = parent.changeProb
         this.species = parent.species;
-        this.bias += parent.bias;
+        this.bias += parent.weight;
         this.weight = parent.weight + bias;
         this.input = parent.output;
         this.output = this.input * this.weight + this.bias
