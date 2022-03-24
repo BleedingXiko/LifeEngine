@@ -3,8 +3,16 @@ const BodyCell = require("./BodyCell");
 const Hyperparams = require("../../../Hyperparameters");
 
 class MouthCell extends BodyCell{
-    constructor(org, loc_col, loc_row){
-        super(CellStates.mouth, org, loc_col, loc_row);
+    constructor(org, loc_col, loc_row, skip_distance_whatever=false){
+        super(CellStates.mouth, org, loc_col, loc_row, skip_distance_whatever);
+    }
+
+    static fromSaveJSON(json, org) {
+        let cell = new MouthCell(org, null, null, true);
+        cell.state = CellStates[json.state];
+        cell.loc_col = json.col;
+        cell.loc_row = json.row;
+        return cell;
     }
 
     performFunction() {
@@ -22,7 +30,7 @@ class MouthCell extends BodyCell{
             return;
         if (n_cell.state == CellStates.food){
             env.changeCell(n_cell.col, n_cell.row, CellStates.empty, null);
-            this.org.food_collected += (n_cell.cell_owner && n_cell.cell_owner.food_value) ? n_cell.food_value : 1;
+            this.org.food_collected++;
         }
     }
 }

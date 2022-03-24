@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<meta charste="UTF-8">
+		<meta charset="UTF-8">
 		<title>The Life Engine</title>
 		<link rel="icon" href="./img/icon.png">
 		<link rel="stylesheet" href="./css/style.css">
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/v4-shims.min.css">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 		<script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
 
@@ -31,12 +30,6 @@
 				<input id="slider" type="range" min="1" max="300" value="60">
 				<button class='pause-button' title="Play/Pause. Hotkey: Spacebar"><i class="fa fa-pause"></i></button>
 				<button class="headless" title="Toggle rendering. Hotkey: H"><i class="fa fa-eye-slash"></i></button>
-				<div>
-				<label class="skip-frames-label" title="Skip the entered number of frames every time before render. Hotkey: J" for="skip-frames">
-					Skip Every <input type="number" id="skip-frames-number" min="0" max="1000" value=4 step="1"> Frames 
-				</label>
-				<input id="skip-frames" type="checkbox">
-				</div>
 				<p id='fps'>Target FPS: 60</p>
 				<p id='fps-actual'></p>
 				<button id='reset-env' title='Restarts simulation with default organism.'>Reset</button>
@@ -58,19 +51,24 @@
 					<div class='left-half'>
 						<h3>The Life Engine</h3>
 						<p>The Life Engine is a virtual ecosystem that allows organisms to reproduce, compete, and evolve.</p>
-						<p>Each organism is made up of different colored cells. Hover over each color to learn what it does and change the cell cost by clicking it.</p>
+						<p>Each organism is made up of different colored cells. Hover over each color to learn what it does.</p>
 						<div id='cell-legend'>
-							<div class='cell-legend-type-living' id='mouth' title="Mouth: Eats adjacent food."></div>
-							<div class='cell-legend-type-living' id='producer' title="Producer: Produces adjacent food."></div>
-							<div class='cell-legend-type-living' id='mover' title="Mover: Allows for movement and rotation."></div>
-							<div class='cell-legend-type-living' id='killer' title="Killer: Harms organisms in adjacent cells."></div>
-							<div class='cell-legend-type-living' id='armor' title="Armor: Negates affects of killer cell."></div>
-							<div class='cell-legend-type-living' id='camo' title="Camo: Allows for oganisms to get targeted less."></div>
-							<div class='cell-legend-type-living' id='healer' title="Healer: Allows for oganisms revert damage taken."></div>
-							<div class='cell-legend-type-living' id='eye' title="Eye: Observes cells and decides movement."></div>
+							<div class='cell-legend-type' id='mouth' title="Mouth: Eats adjacent food."></div>
+							<div class='cell-legend-type' id='producer' title="Producer: Produces adjacent food."></div>
+							<div class='cell-legend-type' id='mover' title="Mover: Allows for movement and rotation."></div>
+							<div class='cell-legend-type' id='killer' title="Killer: Harms organisms in adjacent cells."></div>
+							<div class='cell-legend-type' id='armor' title="Armor: Negates affects of killer cell."></div>
+							<div class='cell-legend-type' id='eye' title="Eye: Observes cells and decides movement."></div>
 							<div class='cell-legend-type' id='food' title="Food: Not part of an organism. Once an organism has eaten enough food, it will reproduce."></div>
 							<div class='cell-legend-type' id='wall' title="Wall: Not part of an organism. Blocks movement and reproduction."></div>
 						</div><br>
+					</div>
+					<div class='right-half'>
+						<iframe id="video" src="https://www.youtube.com/embed/iSAKEnRfles"></iframe>
+					</div>
+					<div class='icon-links'>
+						<a href=https://github.com/MaxRobinsonTheGreat/EvolutionSimulatorV2 title='View the code'><i class="fa fa-github"></i></a>
+						<a href="https://twitter.com/max_romana"><i class="fa fa-twitter"></i></a>
 					</div>
 				</div>
 
@@ -80,7 +78,6 @@
 							<button class="edit-mode-btn select" id="select" title="Select organism from world. Hotkey: Z"><i class="fa fa-hand-pointer-o"></i></button>
 							<button class="edit-mode-btn edit" id="edit" title="Edit organism. Hotkey: X"><i class="fa fa-pencil"></i></button>
 							<button class="edit-mode-btn drop-org" id="drop-org" title="Drop organism in world. Hotkey: C"><i class="fa fa-plus"></i></button>
-							<button class="copy-code" id='copy-dc-code' title='Copy organism emoji code to clipboard Hotkey: V (Emergent Garden server)'><i class="fab fa-discord"></i></button>
 						</div>
 						<div id='editor-env'>
 							<canvas id='editor-canvas'></canvas>
@@ -90,13 +87,11 @@
 								<div class='cell-type' id='mouth' title="Mouth: Eats adjacent food."></div>
 								<div class='cell-type' id='producer' title="Producer: Produces adjacent food."></div>
 								<div class='cell-type' id='mover' title="Mover: Allows for movement and rotation."></div>
-								<div class='cell-type' id='camo' title="Camo: Allows for oganisms to get targeted less."></div>
 							</div>
 							<div style='grid-column: 2;'>
 								<div class='cell-type' id='killer' title="Killer: Harms organisms in adjacent cells."></div>
 								<div class='cell-type' id='armor' title="Armor: Negates affects of killer cell."></div>
 								<div class='cell-type' id='eye' title="Eye: Looks for cells to move away from or towards. Click again on a placed cell to rotate"></div>
-								<div class='cell-type' id='healer' title="Healer: Allows for oganisms revert damage taken."></div>
 							</div>
 
 							<button id='clear-editor'>Clear</button>
@@ -110,9 +105,9 @@
 							<h3>Organism Details</h3>
 							<p class='cell-count'>Cell count: </p>
 							<p id='move-range'>Move Range: </p>
-							<p>
-								<span id='mutation-rate'>Mutation Rate:</span><span id='mutation-probs'> (Add: 33, Change: 33, Remove: 33)</span>
-							</p>
+							<p id='mutation-rate'>Mutation Rate: </p>
+							<br>
+						
 							<div class='brain-details'>
 								<h4>Brain</h4>
 								<p class='chase-types'>Move Towards: food</p>
@@ -125,20 +120,11 @@
 							<p class='cell-count'>Cell count: </p>
 							<div id='move-range-cont'>
 								<label for="move-range-edit" title='The number of cells to move before randomly changing direction. Overriden by brain decisions.'>Move Range:</label>
-								<input type="number" id="move-range-edit" min="1" max="100" value=4 step="1">
+								<input type="number" id="move-range-edit" min="1" max="100" value=3 step="1">
 							</div>
 							<div id='mutation-rate-cont'>
 								<label for="mutation-rate-edit" title='Probability that offspring of this organism will mutate'>Mutation Rate:</label>
 								<input type="number" id="mutation-rate-edit" min="1" max="100" value=3 step="1">
-								<span> (</span>
-								<label for="mutation-add-edit" title='Probability that offspring of this organism will add a cell'>Add:</label>
-								<input type="number" id="mutation-add-edit" min="1" max="100" value=33 step="1">
-								<label for="mutation-change-edit" title='Probability that offspring of this organism will change a cell'>Change:</label>
-								<input type="number" id="mutation-change-edit" min="1" max="100" value=33 step="1">
-								<label for="mutation-remove-edit" title='Probability that offspring of this organism will remove a cell'>Remove:</label>
-								<input type="number" id="mutation-remove-edit" min="1" max="100" value=33 step="1">
-								<span> )</span>
-								
 							</div>
 							<!-- <br> -->
 							<div class='brain-details'>
@@ -152,8 +138,6 @@
 									<option value="killer">killer</option>
 									<option value="armor">armor</option>
 									<option value="eye">eye</option>
-									<option value="healer">healer</option>
-									<option value="camo">camo</option>
 								</select>
 
 								<label for="reaction-edit">Reaction: </label>
@@ -199,10 +183,16 @@
 					<div class='right-half'>
 						<br>
 						<button id='random-walls' title="Generates random walls.">Generate random walls</button> <br>
-						<button id="clear-walls" title="Clear All Walls. Hotkey: N">Clear all walls</button>
+						<button id="clear-walls" title="Clear All Walls. Hotkey: B">Clear all walls</button>
 						<br>
 						<label for="clear-walls-reset" title='When on, walls will be cleared when the environment resets'>Clear walls on reset</label>
 						<input type="checkbox" id="clear-walls-reset">
+						<br>
+						<br>
+						<button id='save-sim' title="Save the whole sim in a .json file">Save Sim</button>
+						<button id='load-sim' title="Load saved sim with a .json file">Load Sim</button>
+						<a id="download-sim-el" style="display: none;"></a>
+						<input id="upload-sim-el" style="display: none;" type="file">
 					</div>
 				</div>
 				<div id='hyperparameters' class='tab'>
@@ -225,6 +215,10 @@
 						<br>
 						<label for="food-drop-rate" title='Rate at which food is automatically generated and dropped in the world'>Auto food drop rate:</label>
 						<input type="number" id="food-drop-rate" value=0 max="1000">
+						<br>
+						<label for="extra-mover-cost" title='Additional food cost for movers to reproduce'>Extra mover reproduction cost:</label>
+						<input type="number" id="extra-mover-cost" value=0 max="1000" step="1">
+						
 					</div>
 					<div class='right-half'>
 						<button id='reset-rules'>Reset all controls</button>

@@ -1,6 +1,5 @@
 const CellStates = require("./Cell/CellStates");
 const BodyCellFactory = require("./Cell/BodyCells/BodyCellFactory");
-const Hyperparams = require("../Hyperparameters");
 
 class Anatomy {
     constructor(owner) {
@@ -10,7 +9,13 @@ class Anatomy {
         this.is_mover = false;
         this.has_eyes = false;
         this.birth_distance = 4;
-        this.total_cost = 0;
+    }
+
+    toSaveJSON() {
+        return {
+            cells: this.cells.map(cell => cell.toSaveJSON()),
+            birth_distance: this.birth_distance
+        }
     }
 
     canAddCellAt(c, r) {
@@ -25,7 +30,6 @@ class Anatomy {
     addDefaultCell(state, c, r) {
         var new_cell = BodyCellFactory.createDefault(this.owner, state, c, r);
         this.cells.push(new_cell);
-        this.total_cost += Hyperparams.cost[state.name];
         return new_cell;
     }
 
@@ -35,14 +39,12 @@ class Anatomy {
         }
         var new_cell = BodyCellFactory.createRandom(this.owner, state, c, r);
         this.cells.push(new_cell);
-        this.total_cost += Hyperparams.cost[state.name];
         return new_cell;
     }
 
     addInheritCell(parent_cell) {
         var new_cell = BodyCellFactory.createInherited(this.owner, parent_cell);
         this.cells.push(new_cell);
-        this.total_cost += Hyperparams.cost[new_cell.state.name];
         return new_cell;
     }
 
@@ -63,7 +65,6 @@ class Anatomy {
             var cell = this.cells[i];
             if (cell.loc_col == c && cell.loc_row == r){
                 this.cells.splice(i, 1);
-                this.total_cost -= Hyperparams.cost[cell.state.name];
                 break;
             }
         }
@@ -112,10 +113,6 @@ class Anatomy {
         }
 
         return neighbors;
-    }
-
-    getTotalCost() {
-        return this.total_cost;
     }
 }
 

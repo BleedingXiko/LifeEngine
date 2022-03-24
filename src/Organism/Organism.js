@@ -5,6 +5,10 @@ const Directions = require("./Directions");
 const Anatomy = require("./Anatomy");
 const Brain = require("./Perception/Brain");
 const FossilRecord = require("../Stats/FossilRecord");
+const BodyCell = require("./Cell/BodyCells/BodyCell");
+const Observation = require("./Perception/Observation");
+const BodyCellFactory = require("./Cell/BodyCells/BodyCellFactory");
+const TypeMap = require("./Cell/BodyCells/TypeMap");
 
 class Organism {
     constructor(col, row, env, parent=null) {
@@ -22,10 +26,6 @@ class Organism {
         this.move_range = 4;
         this.ignore_brain_for = 0;
         this.mutability = 5;
-        this.healRate = 5; // 1 / healRate chance of healing neighbors every turn.
-        this.addProb = 33;
-        this.changeProb = 33;
-        this.removeProb = 33;
         this.damage = 0;
         this.brain = new Brain(this);
         if (parent != null) {
@@ -33,12 +33,52 @@ class Organism {
         }
     }
 
+    static fromSaveJSON(json, env) {
+        let org = new Organism(null, null, env);
+        org.c = json.col;
+        org.r = json.row;
+        org.lifetime = json.lifetime;
+        org.food_collected = json.food_collected;
+        org.anatomy.cells = json.anatomy.cells.map(json => {
+            //console.log(BodyCellFactory.type_map[json.state]);
+            //console.log(json.state);
+            return TypeMap[json.state].fromSaveJSON(json, org)
+        });
+        org.anatomy.birth_distance = json.anatomy.birth_distance;
+        org.direction = json.direction;
+        org.rotation = json.rotation;
+        org.move_count = json.move_count;
+        org.move_range = json.move_range;
+        org.ignore_brain_for = json.ignore_brain_for;
+        org.mutability = json.mutability;
+        org.damage = json.damage;
+        org.brain.decisions = json.brain.decisions;
+        //org.species = json.species;
+        return org;
+    }
+
+    toSaveJSON() {
+        return {
+            col: this.c,
+            row: this.r,
+            lifetime: this.lifetime,
+            food_collected: this.food_collected,
+            anatomy: this.anatomy.toSaveJSON(),
+            direction: this.direction,
+            rotation: this.rotation,
+            move_count: this.move_count,
+            move_range: this.move_range,
+            ignore_brain_for: this.ignore_brain_for,
+            mutability: this.mutability,
+            damage: this.damage,
+            brain: this.brain.toSaveJSON(),
+            //species: this.species.toSaveJSON()
+        }
+    }
+
     inherit(parent) {
         this.move_range = parent.move_range;
         this.mutability = parent.mutability;
-        this.addProb = parent.addProb
-        this.removeProb = parent.removeProb
-        this.changeProb = parent.changeProb
         this.species = parent.species;
         // this.birth_distance = parent.birth_distance;
         for (var c of parent.anatomy.cells){
@@ -54,7 +94,7 @@ class Organism {
 
     // amount of food required before it can reproduce
     foodNeeded() {
-        return this.anatomy.getTotalCost();
+        return this.anatomy.is_mover ? this.anatomy.cells.length + Hyperparams.extraMoverFoodCost : this.anatomy.cells.length;
     }
 
     lifespan() {
@@ -64,7 +104,7 @@ class Organism {
     maxHealth() {
         return this.anatomy.cells.length;
     }
-    
+
     reproduce() {
         //produce mutated child
         //check nearby locations (is there room and a direct path)
@@ -101,34 +141,6 @@ class Organism {
             else {
                 mutated = org.mutate();
             }
-            var amount;
-            //mutate the add probability
-            amount = Math.random()*org.mutability - org.mutability/2;
-            org.addProb += amount;
-            org.addProb = Math.min(Math.max(org.addProb, 0), 100);
-            org.changeProb -= amount/2;
-            org.removeProb -= amount/2;
-            //fix the probabilities (floating point errors)
-            org.changeProb = Math.min(Math.max(100 - org.addProb - org.removeProb, 0), 100);
-            org.removeProb = Math.min(Math.max(100 - org.addProb - org.changeProb, 0), 100);
-            //mutate the change probability
-            amount = Math.random()*org.mutability - org.mutability/2;
-            org.changeProb += amount;
-            org.changeProb = Math.min(Math.max(org.changeProb, 0), 100);
-            org.addProb -= amount/2;
-            org.removeProb -= amount/2;
-            //fix the probabilities (floating point errors)
-            org.addProb = Math.min(Math.max(100 - org.changeProb - org.removeProb, 0), 100);
-            org.removeProb = Math.min(Math.max(100 - org.changeProb - org.addProb, 0), 100);
-            //mutate the remove probability
-            amount = Math.random()*org.mutability - org.mutability/2;
-            org.removeProb += amount;
-            org.removeProb = Math.min(Math.max(org.removeProb, 0), 100);
-            org.addProb -= amount/2;
-            org.changeProb -= amount/2;
-            //fix the probabilities (floating point errors)
-            org.addProb = Math.min(Math.max(100 - org.removeProb - org.changeProb, 0), 100);
-            org.changeProb = Math.min(Math.max(100 - org.removeProb - org.addProb, 0), 100);
         }
 
         var direction = Directions.getRandomScalar();
@@ -146,10 +158,10 @@ class Organism {
             this.env.addOrganism(org);
             org.updateGrid();
             if (mutated) {
-                FossilRecord.addSpecies(org, this.species);
+                //FossilRecord.addSpecies(org, this.species);
             }
             else {
-                org.species.addPop();
+                //org.species.addPop();
             }
         }
         Math.max(this.food_collected -= this.foodNeeded(), 0);
@@ -158,8 +170,7 @@ class Organism {
 
     mutate() {
         let mutated = false;
-        if (this.calcRandomChance(this.addProb)) {
-            // Add Cell
+        if (this.calcRandomChance(Hyperparams.addProb)) {
             let branch = this.anatomy.getRandomCell();
             let state = CellStates.getRandomLivingType();//branch.state;
             let growth_direction = Neighbors.all[Math.floor(Math.random() * Neighbors.all.length)]
@@ -170,15 +181,13 @@ class Organism {
                 this.anatomy.addRandomizedCell(state, c, r);
             }
         }
-        if (this.calcRandomChance(this.changeProb)){
-            // Change Cell
+        if (this.calcRandomChance(Hyperparams.changeProb)){
             let cell = this.anatomy.getRandomCell();
             let state = CellStates.getRandomLivingType();
             this.anatomy.replaceCell(state, cell.loc_col, cell.loc_row);
             mutated = true;
         }
-        if (this.calcRandomChance(this.removeProb)){
-            // Remove Cell
+        if (this.calcRandomChance(Hyperparams.removeProb)){
             if(this.anatomy.cells.length > 1) {
                 let cell = this.anatomy.getRandomCell();
                 mutated = this.anatomy.removeCell(cell.loc_col, cell.loc_row);
@@ -288,13 +297,6 @@ class Organism {
         return true;
     }
 
-    heal() {
-        this.damage--;
-        if (this.damage < 0) {
-            this.damage = 0;
-        }
-    }
-
     harm() {
         this.damage++;
         if (this.damage >= this.maxHealth() || Hyperparams.instaKill) {
@@ -306,13 +308,9 @@ class Organism {
         for (var cell of this.anatomy.cells) {
             var real_c = this.c + cell.rotatedCol(this.rotation);
             var real_r = this.r + cell.rotatedRow(this.rotation);
-            if(Hyperparams.cost[cell.state.name] > 0.001) {
-                this.env.changeCell(real_c, real_r, CellStates.food, {food_value: Hyperparams.cost[cell.state.name]});
-            }else{
-                this.env.changeCell(real_c, real_r, CellStates.empty, null);
-            }
+            this.env.changeCell(real_c, real_r, CellStates.food, null);
         }
-        this.species.decreasePop();
+        //this.species.decreasePop();
         this.living = false;
     }
 

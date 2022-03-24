@@ -1,9 +1,8 @@
 // A cell state is used to differentiate type and render the cell
 class CellState{
-    constructor(name, dc_code = ':__:') {
+    constructor(name) {
         this.name = name;
         this.color = 'black';
-        this.dc_code = dc_code;
     }
 
     render(ctx, cell, size) {
@@ -14,47 +13,47 @@ class CellState{
 
 class Empty extends CellState {
     constructor() {
-        super('empty',':vd:');
+        super('empty');
     }
 }
 class Food extends CellState {
     constructor() {
-        super('food',':food:');
+        super('food');
     }
 }
 class Wall extends CellState {
     constructor() {
-        super('wall',':wall:');
+        super('wall');
     }
 }
 class Mouth extends CellState {
     constructor() {
-        super('mouth',':eat:');
+        super('mouth');
     }
 }
 class Producer extends CellState {
     constructor() {
-        super('producer',':prod:');
+        super('producer');
     }
 }
 class Mover extends CellState {
     constructor() {
-        super('mover',':mov:');
+        super('mover');
     }
 }
 class Killer extends CellState {
     constructor() {
-        super('killer',':kill:');
+        super('killer');
     }
 }
 class Armor extends CellState {
     constructor() {
-        super('armor',':arm:');
+        super('armor');
     }
 }
 class Eye extends CellState {
     constructor() {
-        super('eye',':eye:');
+        super('eye');
         this.slit_color = 'black';
     }
     render(ctx, cell, size) {
@@ -75,29 +74,6 @@ class Eye extends CellState {
     }
 }
 
-class Camo extends CellState {
-    constructor() {
-        super('camo');
-    }
-}
-class Healer extends CellState {
-    constructor() {
-        super('healer');
-        this.cross = 'black';
-    }
-    render(ctx, cell, size) {
-        ctx.fillStyle = this.color;
-        ctx.fillRect(cell.x, cell.y, size, size);
-        if(size < 5)
-            return;
-        var fifth = size / 5;
-        ctx.fillStyle = this.cross;
-        ctx.fillRect(cell.x + 2 * fifth, cell.y, fifth, size);
-        ctx.fillRect(cell.x, cell.y + 2 * fifth, size, fifth);
-
-    }
-}
-
 const CellStates = {
     empty: new Empty(),
     food: new Food(),
@@ -108,11 +84,9 @@ const CellStates = {
     killer: new Killer(),
     armor: new Armor(),
     eye: new Eye(),
-    camo: new Camo(),
-    healer: new Healer(),
     defineLists() {
-        this.all = [this.empty, this.food, this.wall, this.mouth, this.producer, this.mover, this.killer, this.armor, this.eye, this.camo, this.healer]
-        this.living = [this.mouth, this.producer, this.mover, this.killer, this.armor, this.eye, this.camo, this.healer];
+        this.all = [this.empty, this.food, this.wall, this.mouth, this.producer, this.mover, this.killer, this.armor, this.eye]
+        this.living = [this.mouth, this.producer, this.mover, this.killer, this.armor, this.eye];
     },
     getRandomName: function() {
         return this.all[Math.floor(Math.random() * this.all.length)].name;

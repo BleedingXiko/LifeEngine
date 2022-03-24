@@ -49,11 +49,6 @@ class WorldEnvironment extends Environment{
             this.renderer.cells_to_render.clear();
             return;
         }
-
-        var render_period = WorldConfig.skip_frames ? this.controller.control_panel.engine.render_period : 0;
-
-        if(this.total_ticks % (render_period + 1) != 0) return;
-
         this.renderer.renderCells();
         this.renderer.renderHighlights();
     }
@@ -106,6 +101,9 @@ class WorldEnvironment extends Environment{
     }
 
     changeCell(c, r, state, owner) {
+        let cell = this.grid_map.cellAt(c, r);
+        if (cell && cell.state == CellStates.wall)
+            this.walls.splice(this.walls.indexOf(cell), 1);
         super.changeCell(c, r, state, owner);
         this.renderer.addToRender(this.grid_map.cellAt(c, r));
         if(state == CellStates.wall)
@@ -141,14 +139,17 @@ class WorldEnvironment extends Environment{
         }
     }
 
-    reset(confirm_reset=true, reset_life=true) {
+    reset(confirm_reset=true, reset_life=true, force_clear_walls=false, organisms=[], total_mutability=0) {
         if (confirm_reset && !confirm('The current environment will be lost. Proceed?'))
             return false;
 
-        this.organisms = [];
-        this.grid_map.fillGrid(CellStates.empty, !WorldConfig.clear_walls_on_reset);
+        this.grid_map.fillGrid(CellStates.empty, force_clear_walls ? false : !WorldConfig.clear_walls_on_reset);
+        this.organisms = organisms;
+        for (let org of this.organisms) {
+            org.updateGrid();
+        }
         this.renderer.renderFullGrid(this.grid_map.grid);
-        this.total_mutability = 0;
+        this.total_mutability = total_mutability;
         this.total_ticks = 0;
         FossilRecord.clear_record();
         if (reset_life)
